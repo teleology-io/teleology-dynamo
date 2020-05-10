@@ -28,6 +28,8 @@ const exampleTable = dynamo({
       name: 'HashGSI',
     },
   ],
+
+  // (Optional) depending on environment
   awsOptions: {
     accessKeyId: 'your_access_key_id', 
     secretAccessKey: 'your_secret_access_key',
