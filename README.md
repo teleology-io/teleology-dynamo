@@ -95,6 +95,9 @@ async table.query(globalSecondaryKeyVal: Object) => Record[] || [];
 
 # Changelog
 
+**0.0.3**
+- Fixed an issues related to updates
+
 **0.0.1**
 - Initial upload
 
