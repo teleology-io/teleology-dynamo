@@ -1,4 +1,4 @@
-export const put = async ({ table: TableName, ddb, item }) => {
+const put = async ({ table: TableName, ddb, item }) => {
   const { Attributes = {} } = await ddb
     .put({
       TableName,
@@ -13,7 +13,7 @@ export const put = async ({ table: TableName, ddb, item }) => {
   };
 };
 
-export const destroy = async ({ table: TableName, ddb, key, value }) =>
+const destroy = async ({ table: TableName, ddb, key, value }) =>
   ddb
     .delete({
       TableName,
@@ -23,7 +23,7 @@ export const destroy = async ({ table: TableName, ddb, key, value }) =>
     })
     .promise();
 
-export const get = async ({ table: TableName, ddb, key, value }) => {
+const get = async ({ table: TableName, ddb, key, value }) => {
   const response = await ddb
     .get({
       TableName,
@@ -36,7 +36,7 @@ export const get = async ({ table: TableName, ddb, key, value }) => {
   if (response && response.Item) return response.Item;
 };
 
-export const query = async ({ table: TableName, ddb, key, value, indexes }) => {
+const query = async ({ table: TableName, ddb, key, value, indexes }) => {
   const foundIndex = indexes.find((it) => it.key === key);
   if (!foundIndex) {
     throw new Error('No index found for key', key);
@@ -56,7 +56,7 @@ export const query = async ({ table: TableName, ddb, key, value, indexes }) => {
   return response && response.Items ? response.Items : [];
 };
 
-export const create = async ({ ddb, table, key, value, item }) => {
+const create = async ({ ddb, table, key, value, item }) => {
   const exists = await get({ ddb, table, key, value, item });
   if (exists) {
     throw new Error(`A record already exists with that ${key}`);
@@ -65,7 +65,7 @@ export const create = async ({ ddb, table, key, value, item }) => {
   return put({ ddb, table, item });
 };
 
-export const update = async ({ ddb, table, key, value, item }) => {
+const update = async ({ ddb, table, key, value, item }) => {
   if (!key || !value) {
     throw new Error('A primary key is needed to update a record');
   }
@@ -80,4 +80,13 @@ export const update = async ({ ddb, table, key, value, item }) => {
       ...exists,
     },
   });
+};
+
+module.exports = {
+  query,
+  get,
+  put,
+  update,
+  create,
+  destroy,
 };

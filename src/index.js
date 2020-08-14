@@ -15,30 +15,30 @@ export default ({ table, key, indexes, awsOptions }) => {
   };
 
   return {
-    get: (pk) =>
+    get: async (pk) =>
       delegate.get({
         ...baseParams,
         value: pk,
       }),
 
-    create: (item) => {
+    create: async (item) => {
       const { [key]: value } = item;
 
       return delegate.create({ ...baseParams, value, item });
     },
 
-    update: (item) => {
+    update: async (item) => {
       const { [key]: value } = item;
       return delegate.update({ ...baseParams, value, item });
     },
 
-    delete: (pk) =>
+    delete: async (pk) =>
       delegate.destroy({
         ...baseParams,
         value: pk,
       }),
 
-    query: (keyVal) => {
+    query: async (keyVal) => {
       const [firstKey] = Object.keys(keyVal);
       return delegate.query({
         ...baseParams,

@@ -1,6 +1,6 @@
 {
   "name": "@teleology/dynamo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A configurable client wrapper around DynamoDB.DocumentClient",
   "main": "lib/index.js",
   "files": [
