@@ -1,4 +1,19 @@
-import AWS from 'aws-sdk';
+const AWS = require('aws-sdk');
+
+const put = async ({ ddb, table, item }) => {
+  const { Attributes = {} } = await ddb
+    .put({
+      TableName: table,
+      Item: item,
+      ReturnValues: 'ALL_OLD',
+    })
+    .promise();
+
+  return {
+    ...Attributes,
+    ...item,
+  };
+};
 
 const getter = async ({ ddb, table, key, value }) => {
   const response = await ddb
@@ -18,18 +33,15 @@ const updater = async ({ ddb, table, key, value, item }) => {
     throw new Error('A primary key is needed to update a record');
   }
 
-  const { Attributes = {} } = await ddb
-    .put({
-      TableName: table,
-      Item: item,
-      ReturnValues: 'ALL_OLD',
-    })
-    .promise();
-
-  return {
-    ...Attributes,
-    ...item,
-  };
+  const exists = await getter({ ddb, table, key, value, item });
+  return put({
+    ddb,
+    table,
+    item: {
+      ...item,
+      ...exists,
+    },
+  });
 };
 
 const creator = async ({ ddb, table, key, value, item }) => {
@@ -38,7 +50,7 @@ const creator = async ({ ddb, table, key, value, item }) => {
     throw new Error(`A record already exists with that ${key}`);
   }
 
-  return updater({ ddb, table, key, value, item });
+  return put({ ddb, table, item });
 };
 
 const destroy = async ({ ddb, table, key, value }) =>
@@ -61,6 +73,7 @@ const queryable = async ({ ddb, table, key, value, indexes }) => {
     .query({
       TableName: table,
       IndexName: foundIndex.name,
+      Limit: 5,
       KeyConditionExpression: `${key} = :${key}`,
       ExpressionAttributeValues: {
         [`:${key}`]: value,

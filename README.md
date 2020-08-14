@@ -20,7 +20,7 @@ Configuration is easy and mimics much of the pre-defined attributes of the Dynam
 import dynamo from '@teleology/dynamo';
 
 const exampleTable = dynamo({
-  table: process.env.EXAMPLE_TABLE,
+  table: process.env.EXAMPLE_TABLE || 'Example',
   key: 'id',
   indexes: [
     {
