@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  table-example
+  
+Resources:
+  GenericTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: !Sub 'generic-${Stage}'
+      KeySchema:
+        - AttributeName: id 
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - 
+          IndexName: EmailGSI
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection: 
+            ProjectionType: ALL
+ 
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Applicant environment 
+    AllowedValues:
+      - prod
+      - dev

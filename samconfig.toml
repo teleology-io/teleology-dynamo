@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "teleology-dynamo-sample-dev"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-sbg31awvgvo"
+s3_prefix = "teleology-dynamo-sample-dev"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Stage=\"dev\""

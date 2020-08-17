@@ -76,8 +76,8 @@ const update = async ({ ddb, table, key, value, item }) => {
     ddb,
     table,
     item: {
-      ...item,
       ...exists,
+      ...item,
     },
   });
 };

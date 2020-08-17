@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const delegate = require('./delegate');
 
-export default ({ table, key, indexes, awsOptions }) => {
+export default ({ table, awsOptions }) => {
   const ddb = new AWS.DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
     ...awsOptions,
@@ -9,9 +9,7 @@ export default ({ table, key, indexes, awsOptions }) => {
 
   const baseParams = {
     table,
-    key,
     ddb,
-    indexes,
   };
 
   return {
