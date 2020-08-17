@@ -1,3 +1,5 @@
+const merge = require('lodash.merge');
+
 const put = async ({ table: TableName, ddb, item }) => {
   const { Attributes = {} } = await ddb
     .put({
@@ -7,10 +9,7 @@ const put = async ({ table: TableName, ddb, item }) => {
     })
     .promise();
 
-  return {
-    ...Attributes,
-    ...item,
-  };
+  return merge(Attributes, item);
 };
 
 const destroy = async ({ table: TableName, ddb, key, value }) =>
@@ -75,10 +74,7 @@ const update = async ({ ddb, table, key, value, item }) => {
   return put({
     ddb,
     table,
-    item: {
-      ...item,
-      ...exists,
-    },
+    item: merge(exists, item),
   });
 };
 

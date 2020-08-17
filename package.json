@@ -1,6 +1,6 @@
 {
   "name": "@teleology/dynamo",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A configurable client wrapper around DynamoDB.DocumentClient",
   "main": "lib/index.js",
   "files": [
@@ -48,6 +48,7 @@
     "prettier": "^2.0.5"
   },
   "dependencies": {
-    "aws-sdk": "^2.733.0"
+    "aws-sdk": "^2.733.0",
+    "lodash.merge": "^4.6.2"
   }
 }
