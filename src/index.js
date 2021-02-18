@@ -1,8 +1,19 @@
-const AWS = require('aws-sdk');
-const delegate = require('./delegate');
+const DynamoDB = require('aws-sdk/clients/dynamodb');
+const queryDelegate = require('./query');
+const getDelegate = require('./get');
+const updateDelegate = require('./update');
+const createDelegate = require('./create');
+const destroyDelegate = require('./destroy');
+const describe = require('./describe');
+
+const DEFAULT_MERGE = (old, n) => ({
+  ...old,
+  ...n,
+});
 
 export default ({ table, awsOptions }) => {
-  const ddb = new AWS.DynamoDB.DocumentClient({
+  let described = false;
+  const ddb = new DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
     ...awsOptions,
   });
@@ -12,37 +23,75 @@ export default ({ table, awsOptions }) => {
     ddb,
   };
 
+  const init = async () => {
+    if (!described) {
+      const def = await describe({ table, awsOptions });
+      Object.assign(baseParams, def);
+      described = true;
+    }
+  };
+
+  const query = async (keyVal) => {
+    await init();
+
+    const [firstKey] = Object.keys(keyVal);
+    return queryDelegate({
+      ...baseParams,
+      key: firstKey,
+      value: keyVal[firstKey],
+    });
+  };
+
+  const get = async (pk) => {
+    await init();
+
+    return getDelegate({
+      ...baseParams,
+      value: pk,
+    });
+  };
+
+  const update = async (item, merger = DEFAULT_MERGE) => {
+    await init();
+
+    const { [baseParams.key]: value } = item;
+    return updateDelegate({
+      ...baseParams,
+      value,
+      item,
+      merge: merger,
+    });
+  };
+
+  const create = async (item) => {
+    await init();
+
+    const { [baseParams.key]: value } = item;
+    return createDelegate({
+      ...baseParams,
+      value,
+      item,
+    });
+  };
+
+  const destroy = async (pk) => {
+    await init();
+
+    return destroyDelegate({
+      ...baseParams,
+      value: pk,
+    });
+  };
+
   return {
-    get: async (pk) =>
-      delegate.get({
-        ...baseParams,
-        value: pk,
-      }),
+    get,
 
-    create: async (item) => {
-      const { [key]: value } = item;
+    create,
 
-      return delegate.create({ ...baseParams, value, item });
-    },
+    update,
 
-    update: async (item) => {
-      const { [key]: value } = item;
-      return delegate.update({ ...baseParams, value, item });
-    },
+    delete: destroy,
 
-    delete: async (pk) =>
-      delegate.destroy({
-        ...baseParams,
-        value: pk,
-      }),
-
-    query: async (keyVal) => {
-      const [firstKey] = Object.keys(keyVal);
-      return delegate.query({
-        ...baseParams,
-        key: firstKey,
-        value: keyVal[firstKey],
-      });
-    },
+    query,
   };
 };
