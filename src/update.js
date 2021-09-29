@@ -6,11 +6,11 @@ module.exports = async ({ ddb, table, key, value, item, merge }) => {
     throw new Error('A primary key is needed to update a record');
   }
 
-  const exists = await get({ ddb, table, key, value, item });
+  const exist = await get({ ddb, table, key, value, item });
 
   return put({
     ddb,
     table,
-    item: merge(exists, item),
+    item: merge(exist, item),
   });
 };

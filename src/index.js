@@ -34,11 +34,9 @@ export default ({ table, awsOptions }) => {
   const query = async (keyVal) => {
     await init();
 
-    const [firstKey] = Object.keys(keyVal);
     return queryDelegate({
       ...baseParams,
-      key: firstKey,
-      value: keyVal[firstKey],
+      entries: Object.entries(keyVal),
     });
   };
 

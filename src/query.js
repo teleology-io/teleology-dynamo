@@ -1,8 +1,36 @@
 /* eslint-disable no-await-in-loop */
-module.exports = async ({ table: TableName, ddb, key, value, indexes }) => {
-  const foundIndex = indexes.find((it) => it.key === key);
-  if (!foundIndex) {
-    throw new Error('No index found for key', key);
+module.exports = async ({ table: TableName, ddb, entries, indexes }) => {
+  const expressions = entries
+    .map(([k, v]) => {
+      const indexExists = indexes.find((it) => it.key === k);
+      if (!indexExists) {
+        throw new Error('No index found for key', k);
+      }
+
+      return {
+        indexName: indexExists.name,
+        expression: `${k} = :${k}`,
+        attribute: {
+          [`:${k}`]: v,
+        },
+      };
+    })
+    .filter(Boolean);
+
+  const [first, ...rest] = expressions;
+
+  const params = {
+    TableName,
+    IndexName: first.indexName,
+    KeyConditionExpression: first.expression,
+    ExpressionAttributeValues: expressions.reduce(
+      (a, b) => ({ ...a, ...b.attribute }),
+      {},
+    ),
+  };
+
+  if (rest && rest.length > 0) {
+    params.FilterExpression = rest.map((it) => it.expression).join(' AND ');
   }
 
   let lastKey;
@@ -10,12 +38,7 @@ module.exports = async ({ table: TableName, ddb, key, value, indexes }) => {
   while (true) {
     const { Items = [], LastEvaluatedKey } = await ddb
       .query({
-        TableName,
-        IndexName: foundIndex.name,
-        KeyConditionExpression: `${key} = :${key}`,
-        ExpressionAttributeValues: {
-          [`:${key}`]: value,
-        },
+        ...params,
         ExclusiveStartKey: lastKey,
       })
       .promise();

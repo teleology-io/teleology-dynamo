@@ -21,13 +21,6 @@ import dynamo from '@teleology/dynamo';
 
 const exampleTable = dynamo({
   table: process.env.EXAMPLE_TABLE || 'Example',
-  key: 'id',
-  indexes: [
-    {
-      key: 'hid',
-      name: 'HashGSI',
-    },
-  ],
 
   // (Optional) depending on environment
   awsOptions: {
@@ -94,6 +87,9 @@ async table.query(globalSecondaryKeyVal: Object) => Record[] || [];
 ```
 
 # Changelog
+
+**0.1.1**
+- Adding ability to query on multiple GSI's instead of one
 
 **0.0.3**
 - Fixed an issues related to updates
