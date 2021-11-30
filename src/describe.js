@@ -3,8 +3,8 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 const hash = (schema) =>
   schema.find((it) => it.KeyType === 'HASH').AttributeName;
 
-module.exports = async ({ table: TableName, awsOptions }) => {
-  const ddb = new DynamoDB(awsOptions);
+module.exports = async ({ table: TableName, options }) => {
+  const ddb = new DynamoDB(options);
   const { Table } = await ddb.describeTable({ TableName }).promise();
   const { KeySchema, GlobalSecondaryIndexes = [] } = Table;
 

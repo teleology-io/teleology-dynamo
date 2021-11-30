@@ -5,17 +5,18 @@ const updateDelegate = require('./update');
 const createDelegate = require('./create');
 const destroyDelegate = require('./destroy');
 const describe = require('./describe');
+const batch = require('./batch');
 
 const DEFAULT_MERGE = (old, n) => ({
   ...old,
   ...n,
 });
 
-export default ({ table, awsOptions }) => {
+export default ({ table, options }) => {
   let described = false;
   const ddb = new DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
-    ...awsOptions,
+    ...options,
   });
 
   const baseParams = {
@@ -25,7 +26,7 @@ export default ({ table, awsOptions }) => {
 
   const init = async () => {
     if (!described) {
-      const def = await describe({ table, awsOptions });
+      const def = await describe({ table, options });
       Object.assign(baseParams, def);
       described = true;
     }
@@ -72,6 +73,33 @@ export default ({ table, awsOptions }) => {
     });
   };
 
+  const batchGet = async (...keys) => {
+    await init();
+
+    return batch.batchGet({
+      ...baseParams,
+      values: keys,
+    });
+  };
+
+  const batchDelete = async (...keys) => {
+    await init();
+
+    return batch.batchDelete({
+      ...baseParams,
+      values: keys,
+    });
+  };
+
+  const batchPut = async (...entities) => {
+    await init();
+
+    return batch.batchPut({
+      ...baseParams,
+      values: entities,
+    });
+  };
+
   const destroy = async (pk) => {
     await init();
 
@@ -89,6 +117,12 @@ export default ({ table, awsOptions }) => {
     update,
 
     delete: destroy,
+
+    batchGet,
+
+    batchDelete,
+
+    batchPut,
 
     query,
   };

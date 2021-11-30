@@ -14,7 +14,7 @@ npm i --save aws-sdk @teleology/dynamo
 
 # Configuration
 
-Configuration is easy and mimics much of the pre-defined attributes of the DynamoDB table such as a table name, primary key, and secondary indexes. The library is aimed to be used within an AWS lambda context, if you are not within an environment that automatically handles this for you. You can pass the optional `awsOptions` to seed credentials, region and apiVersion for DynamoDB.DocumentClient. For concerned parties, the `awsOptions` are used in a pass-through fashion.
+Configuration is easy and mimics much of the pre-defined attributes of the DynamoDB table such as a table name, primary key, and secondary indexes. The library is aimed to be used within an AWS lambda context, if you are not within an environment that automatically handles this for you. You can pass the optional `options` to seed credentials, region and apiVersion for DynamoDB.DocumentClient. For concerned parties, the `options` are used in a pass-through fashion.
 
 ```javascript
 import dynamo from '@teleology/dynamo';
@@ -23,7 +23,7 @@ const exampleTable = dynamo({
   table: process.env.EXAMPLE_TABLE || 'Example',
 
   // (Optional) depending on environment
-  awsOptions: {
+  options: {
     accessKeyId: 'your_access_key_id', 
     secretAccessKey: 'your_secret_access_key',
     region: 'us-east-1',
@@ -85,6 +85,26 @@ async table.delete(primaryKey: String)
 ```javascript
 async table.query(globalSecondaryKeyVal: Object) => Record[] || [];
 ```
+
+### Batch Put
+
+```javascript
+async table.batchPut(items ...Object);
+```
+
+### Batch Delete
+
+```javascript
+async table.batchDelete(primaryKeys ...String);
+```
+
+### Batch Get
+
+```javascript
+async table.batchGet(primaryKeys ...String) => Items[];
+```
+
+
 
 # Changelog
 
