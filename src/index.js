@@ -105,6 +105,7 @@ export default ({ table, options }) => {
 
     return destroyDelegate({
       ...baseParams,
+      query,
       value: pk,
     });
   };

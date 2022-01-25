@@ -108,6 +108,9 @@ async table.batchGet(primaryKeys ...String) => Items[];
 
 # Changelog
 
+**0.2.1**
+- Adding query operation to delete function for GSI
+
 **0.1.1**
 - Adding ability to query on multiple GSI's instead of one
 
